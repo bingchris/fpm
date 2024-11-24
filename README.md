@@ -1,1 +1,1 @@
-# foo - Foo Offers Options
+# foo
