@@ -1,1 +1,1 @@
-# cory
+# foo - Foo Offers Options
