@@ -21,24 +21,6 @@ string get_mirlink() {
     return result;
 }
 
-void print_file_content(const string &filepath) {
-    string command = "cat " + filepath;
-    unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
-    if (!pipe) {
-        throw runtime_error("Failed to run command: " + command);
-    }
-    array<char, 128> buffer;
-    string content;
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        content += buffer.data();
-    }
-
-    stringstream ss(content);
-    string line;
-    while (getline(ss, line)) {
-        cout << line << endl;
-    }
-}
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -59,6 +41,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     string command;
+    string catcommand;
     for (int i = 2; i < argc; ++i) {
         if (action == 1) {
             string whatpack = argv[i];
@@ -68,24 +51,54 @@ int main(int argc, char *argv[]) {
                 getline(ss, packagename, '/');
 
                 command = "wget -q --show-progress " + setmirlink + group + "/" + packagename + "/adds";
+                catcommand = "wget -q --show-progress " + setmirlink + group + "/" + packagename + "/";
             } else {
                 packagename = whatpack;
                 group = ""; // Or handle it as needed
 
                 command = "wget -q --show-progress " + setmirlink + packagename + "/adds";
+                catcommand = "wget -q --show-progress " + setmirlink + packagename + "/";
             }
-            unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
-            if (!pipe) {
-                throw runtime_error("Command to get files failed!\n"  + command);
-            }
-            array<char, 128> buffer;
-            string adds;
-            while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-                adds += buffer.data();
-            }
-            cout << adds << endl;
 
-            print_file_content("adds");
+            // Run the wget command and wait for it to complete
+            int ret = system(command.c_str());
+            if (ret != 0) {
+                throw runtime_error("Command to get files failed!\n" + command);
+            }
+
+            // Run the cat command to read the content of the adds file
+            string catcmd = "cat adds";
+            ret = system(catcmd.c_str());
+            if (ret != 0) {
+                throw runtime_error("Failed to run command: " + catcmd);
+            }
+
+            array<char, 128> buffer;
+            string content;
+            FILE* file = fopen("adds", "r");
+            if (!file) {
+                throw runtime_error("Failed to open adds file!");
+            }
+            while (fgets(buffer.data(), buffer.size(), file) != nullptr) {
+                content += buffer.data();
+            }
+            fclose(file);
+
+            stringstream ss(content);
+            string line;
+            while (getline(ss, line)) {
+                string download_command = catcommand + line;
+                ret = system(download_command.c_str());
+                if (ret != 0) {
+                    throw runtime_error("Failed to run command: " + download_command);
+                }
+                string chmodcommand = "chmod 755 " + line;
+                cout << chmodcommand << endl;
+                ret = system(chmodcommand.c_str());
+                if (ret != 0) {
+                    throw runtime_error("Failed to run command: " + chmodcommand);
+                }
+            }
         }
     }
 
