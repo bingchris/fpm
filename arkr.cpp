@@ -83,7 +83,8 @@ int main(int argc, char *argv[]) {
                 content += buffer.data();
             }
             fclose(file);
-
+            system(("wget " + setmirlink + packagename + "/optional.json").c_str());
+            system("cat optional.json"); cout << endl;
             stringstream ss(content);
             string line;
             while (getline(ss, line)) {
