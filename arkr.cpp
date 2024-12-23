@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
     string command;
     string catcommand;
     for (int i = 2; i < argc; ++i) {
-        packlist.push_back(argv[i]);
         if (action == 1) {
+            packlist.push_back(argv[i]);
             string whatpack = argv[i];
             if (whatpack.find('/') != string::npos) {
                 stringstream ss(whatpack);
