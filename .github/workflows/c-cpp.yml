@@ -30,7 +30,7 @@ jobs:
     - name: Compile ArKr
       run: g++ ./arkr.cpp -o arkr
     - name: Upload ArKr binary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: arkr-binary
         path: ./arkr
