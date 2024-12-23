@@ -50,13 +50,13 @@ int main(int argc, char *argv[]) {
                 getline(ss, group, '/');
                 getline(ss, packagename, '/');
 
-                command = "wget -q --show-progress " + setmirlink + group + "/" + packagename + "/adds";
+                command = "wget -q " + setmirlink + group + "/" + packagename + "/adds";
                 catcommand = "wget -q --show-progress " + setmirlink + group + "/" + packagename + "/";
             } else {
                 packagename = whatpack;
                 group = ""; // Or handle it as needed
 
-                command = "wget -q --show-progress " + setmirlink + packagename + "/adds";
+                command = "wget -q " + setmirlink + packagename + "/adds";
                 catcommand = "wget -q --show-progress " + setmirlink + packagename + "/";
             }
 
@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
 
             // Run the cat command to read the content of the adds file
             string catcmd = "cat adds";
+            cout << "Binaries to download:" << endl;
             ret = system(catcmd.c_str());
             if (ret != 0) {
                 throw runtime_error("Failed to run command: " + catcmd);
@@ -83,23 +84,29 @@ int main(int argc, char *argv[]) {
                 content += buffer.data();
             }
             fclose(file);
-            system(("wget " + setmirlink + packagename + "/optional.json").c_str());
+            system(("wget -q " + setmirlink + packagename + "/optional.json").c_str());
+	    cout << "Optional packages:" << endl;
             system("cat optional.json"); cout << endl;
             stringstream ss(content);
             string line;
             while (getline(ss, line)) {
                 string download_command = catcommand + line;
+		cout << "Downloading " << line << endl;
                 ret = system(download_command.c_str());
                 if (ret != 0) {
                     throw runtime_error("Failed to run command: " + download_command);
                 }
-                string chmodcommand = "chmod 755 " + line;
+            };
+	    ss.clear();
+	    ss.seekg(0,ss.beg);
+            while (getline(ss, line)) {
+		string chmodcommand = "chmod 755 " + line;
                 cout << chmodcommand << endl;
                 ret = system(chmodcommand.c_str());
                 if (ret != 0) {
                     throw runtime_error("Failed to run command: " + chmodcommand);
                 }
-            }
+	    }
         }
     }
 
