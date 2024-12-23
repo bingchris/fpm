@@ -9,6 +9,7 @@ on:
       - '**/*.hpp'
       - '**/*.c'
       - '**/*.h'
+      - '**/*.yml'
   pull_request:
     branches:
       - main
@@ -17,6 +18,7 @@ on:
       - '**/*.hpp'
       - '**/*.c'
       - '**/*.h'
+      - '**/*.yml'
 
 jobs:
   build:
