@@ -85,28 +85,28 @@ int main(int argc, char *argv[]) {
             }
             fclose(file);
             system(("wget -q " + setmirlink + packagename + "/optional.json").c_str());
-	    cout << "Optional packages:" << endl;
+	        cout << "Optional packages:" << endl;
             system("cat optional.json"); cout << endl;
             stringstream ss(content);
             string line;
             while (getline(ss, line)) {
                 string download_command = catcommand + line;
-		cout << "Downloading " << line << endl;
+		        cout << "Downloading " << line << endl;
                 ret = system(download_command.c_str());
                 if (ret != 0) {
                     throw runtime_error("Failed to run command: " + download_command);
                 }
             };
-	    ss.clear();
-	    ss.seekg(0,ss.beg);
+            ss.clear();
+            ss.seekg(0,ss.beg);
             while (getline(ss, line)) {
-		string chmodcommand = "chmod 755 " + line;
+		        string chmodcommand = "chmod 755 " + line;
                 cout << chmodcommand << endl;
                 ret = system(chmodcommand.c_str());
                 if (ret != 0) {
                     throw runtime_error("Failed to run command: " + chmodcommand);
                 }
-	    }
+	        }
         }
     }
 
