@@ -132,6 +132,8 @@ int main(int argc, char *argv[]) {
                     throw runtime_error("Failed to run command: " + chmodcommand);
                 }
 	        }
+        } else if (action==2) {
+            packlist.erase(remove(packlist.begin(), packlist.end(), argv[i]));
         }
     }
     if (arkrjson["packages"]==packlist){
