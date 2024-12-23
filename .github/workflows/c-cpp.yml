@@ -2,9 +2,21 @@ name: Build ArKr
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths:
+      - '**/*.cpp'
+      - '**/*.hpp'
+      - '**/*.c'
+      - '**/*.h'
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths:
+      - '**/*.cpp'
+      - '**/*.hpp'
+      - '**/*.c'
+      - '**/*.h'
 
 jobs:
   build:
@@ -13,5 +25,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: make
+    - name: Compile ArKr
       run: g++ ./arkr.cpp -o arkr
+    - name: Upload ArKr binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: arkr-binary
+        path: ./arkr
