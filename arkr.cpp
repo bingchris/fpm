@@ -9,6 +9,7 @@
 #include "json.hpp"
 #include <unistd.h>
 #include <ctime>
+#include <algorithm>
 using json = nlohmann::json_abi_v3_11_3::json;
 using namespace std;
 const string version = "rolling";
@@ -16,9 +17,6 @@ string get_mirlink() {
     array<char, 128> buffer;
     string result;
     unique_ptr<FILE, decltype(&pclose)> pipe(popen("cat /etc/arkr/mirlink | tr -d '\n'", "r"), pclose); /* http://example.com/packages/arch/ */
-    if (!pipe) {
-        throw runtime_error("popen() failed!");
-    }
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         result += buffer.data();
     }
@@ -106,7 +104,12 @@ int main(int argc, char *argv[]) {
     string catcommand;
     for (int i = 2; i < argc; ++i) {
         if (action == 1) {
-            packlist.push_back(argv[i]);
+            string packtoadd = argv[i];
+            if (find(packlist.begin(), packlist.end(), packtoadd) == packlist.end()) {
+                packlist.push_back(packtoadd);
+            } else {
+                cout << "Package " << packtoadd << " is already installed. Reinstalling." << endl;
+            }
             string whatpack = argv[i];
             if (whatpack.find('/') != string::npos) {
                 stringstream ss(whatpack);
@@ -125,37 +128,55 @@ int main(int argc, char *argv[]) {
 
             int ret = system(command.c_str());
             if (ret != 0) {
-                throw runtime_error("Command to get files failed!\n" + command);
+                cerr << ("Command to get files failed!\n" + command) << endl;
+                return 1;
             }
 
             string catcmd = "cat adds";
             cout << "Binaries to download:" << endl;
             ret = system(catcmd.c_str());
             if (ret != 0) {
-                throw runtime_error("Failed to run command: " + catcmd);
+                cerr << ("Failed to run command: " + catcmd) << endl;
+                return 1;
             }
 
-            array<char, 128> buffer;
-            string content;
-            FILE* file = fopen("adds", "r");
-            if (!file) {
-                throw runtime_error("Failed to open adds file!");
+            array<char, 128> addsbuffer;
+            string addscontent;
+            FILE* addsfile = fopen("adds", "r");
+            if (!addsfile) {
+                cerr << ("Failed to open adds file!") << endl;
+                return 1;
             }
-            while (fgets(buffer.data(), buffer.size(), file) != nullptr) {
-                content += buffer.data();
+            while (fgets(addsbuffer.data(), addsbuffer.size(), addsfile) != nullptr) {
+                addscontent += addsbuffer.data();
             }
-            fclose(file);
+            fclose(addsfile);
             system(("wget -q " + setmirlink + packagename + "/optional.json").c_str());
+
+
+            system(("wget -q " + setmirlink + packagename + "/version").c_str());
+            array<char, 128> versionbuffer;
+            string versioncontent;
+            FILE* versionfile = fopen("version", "r");
+            if (!versionfile) {
+                cerr << ("Failed to open version file!") << endl;
+                return 1;
+            }
+            while (fgets(versionbuffer.data(), versionbuffer.size(), versionfile) != nullptr) {
+                versioncontent += versionbuffer.data();
+            }
+            fclose(versionfile);
 	        cout << "Optional packages:" << endl;
             system("cat optional.json"); cout << endl;
-            stringstream ss(content);
+            stringstream ss(addscontent);
             string line;
             while (getline(ss, line)) {
                 string download_command = catcommand + line;
 		        cout << "Downloading " << line << endl;
                 ret = system(download_command.c_str());
                 if (ret != 0) {
-                    throw runtime_error("Failed to run command: " + download_command);
+                    cerr << ("Failed to run command: " + download_command) << endl;
+                    return 1;
                 }
             };
             ss.clear();
@@ -167,9 +188,19 @@ int main(int argc, char *argv[]) {
                 if (ret != 0) {
                     throw runtime_error("Failed to run command: " + chmodcommand);
                 }
-	        }
+	        };
+            ss.clear();
+            ss.seekg(0,ss.beg);
+            arkrjson["packagever"][packagename] = versioncontent;
+            
         } else if (action==2) {
-            packlist.erase(remove(packlist.begin(), packlist.end(), argv[i]));
+            auto iter = remove(packlist.begin(), packlist.end(), argv[i]);
+            if (iter != packlist.end()) {
+                packlist.erase(iter, packlist.end());
+            } else {
+                cerr << "No package named that!" << endl;
+                system("cat /etc/arkr.json");
+            }
         }
     }
     if (arkrjson["packages"]==packlist){
