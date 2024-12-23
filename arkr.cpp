@@ -8,9 +8,10 @@
 #include <string>
 #include "json.hpp"
 #include <unistd.h>
+#include <ctime>
 using json = nlohmann::json_abi_v3_11_3::json;
 using namespace std;
-
+const string version = "rolling";
 string get_mirlink() {
     array<char, 128> buffer;
     string result;
@@ -62,6 +63,41 @@ int main(int argc, char *argv[]) {
         cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
         return 1;
     }
+    } else if (string(argv[1]) == "about") {
+        // Get compile time
+        const char* compileDate = __DATE__;
+        const char* compileTime = __TIME__;
+
+        // Parse compile date and time
+        int month, day, year, hour, minute, second;
+        sscanf(compileDate, "%*s %d %d", &day, &year);
+        string monthStr = string(compileDate).substr(0, 3);
+
+        // Convert month string to number
+        if (monthStr == "Jan") month = 1;
+        else if (monthStr == "Feb") month = 2;
+        else if (monthStr == "Mar") month = 3;
+        else if (monthStr == "Apr") month = 4;
+        else if (monthStr == "May") month = 5;
+        else if (monthStr == "Jun") month = 6;
+        else if (monthStr == "Jul") month = 7;
+        else if (monthStr == "Aug") month = 8;
+        else if (monthStr == "Sep") month = 9;
+        else if (monthStr == "Oct") month = 10;
+        else if (monthStr == "Nov") month = 11;
+        else if (monthStr == "Dec") month = 12;
+
+        // Parse time
+        sscanf(compileTime, "%d:%d:%d", &hour, &minute, &second);
+
+        // Format time string
+        char buffer[16];
+        snprintf(buffer, sizeof(buffer), "%02d%02d%04d%02d%02d%02d", day, month, year, second, minute, hour);
+
+        // Print version and compile time
+        cout << "Version: " << version << endl;
+        cout << "Build date: " << buffer << endl;
+        return 0;
     } else {
         cerr << "Invalid action: " << argv[1] << endl;
         return 1;
