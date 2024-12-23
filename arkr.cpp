@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
         // Format time string
         char buffer[16];
-        snprintf(buffer, sizeof(buffer), "%02d%02d%04d%02d%02d%02d", day, month, year, second, minute, hour);
+        snprintf(buffer, sizeof(buffer), "%02d%02d%04d%02d%02d%02d", day, month, year, hour, minute, second);
 
         // Print version and compile time
         cout << "Version: " << version << endl;
