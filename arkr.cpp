@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
     string command;
     string catcommand;
     for (int i = 2; i < argc; ++i) {
+        packlist.push_back(argv[i]);
         if (action == 1) {
             string whatpack = argv[i];
             if (whatpack.find('/') != string::npos) {
@@ -133,6 +134,18 @@ int main(int argc, char *argv[]) {
 	        }
         }
     }
-
+    if (arkrjson["packages"]==packlist){
+        cout << "No changes done to packlist." << endl;
+    } else {
+        arkrjson["packages"]=packlist;
+        ofstream outputarkrjson("/etc/arkr.json");
+        if (!outputarkrjson.is_open()) {
+            cerr << "Cannot open arkr.json!!!" << endl;
+            return 1;
+        }
+        outputarkrjson << setw(4) << arkrjson << endl;
+        outputarkrjson.close();
+        cout << "Wrote new package list" << endl;
+    }
     return 0;
 }
