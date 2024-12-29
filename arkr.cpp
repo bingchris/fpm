@@ -62,16 +62,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     } else if (string(argv[1]) == "about") {
-        // Get compile time
+        // compile time and date
         const char* compileDate = __DATE__;
         const char* compileTime = __TIME__;
-
-        // Parse compile date and time
+        // parseing
         int month, day, year, hour, minute, second;
         sscanf(compileDate, "%*s %d %d", &day, &year);
         string monthStr = string(compileDate).substr(0, 3);
-
-        // Convert month string to number
+        // we dont like month names
         if (monthStr == "Jan") month = 1;
         else if (monthStr == "Feb") month = 2;
         else if (monthStr == "Mar") month = 3;
@@ -84,15 +82,11 @@ int main(int argc, char *argv[]) {
         else if (monthStr == "Oct") month = 10;
         else if (monthStr == "Nov") month = 11;
         else if (monthStr == "Dec") month = 12;
-
-        // Parse time
+        // more pasreing
         sscanf(compileTime, "%d:%d:%d", &hour, &minute, &second);
-
-        // Format time string
+        // now formateing
         char buffer[16];
         snprintf(buffer, sizeof(buffer), "%02d%02d%04d%02d%02d%02d", day, month, year, hour, minute, second);
-
-        // Print version and compile time
         cout << "Version: " << version << endl;
         cout << "Build date: " << buffer << endl;
         return 0;
