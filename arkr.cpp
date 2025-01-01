@@ -61,6 +61,20 @@ int main(int argc, char *argv[]) {
         cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
         return 1;
     }
+    } else if (string(argv[1]) == "configure") {
+        if (geteuid() != 0) {
+        cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
+        return 1;
+    } else {
+        int confret = system(("cp " + string(argv[2]) + " /etc/arkr.json").c_str()); 
+        if (confret != 0) {
+            cerr << "Failed to copy " << string(argv[2]) << " to /etc/arkr.json" << endl;
+            return 1;
+        }
+        cout << "Copied " << string(argv[2]) << " to /etc/arkr.json" << endl;
+        return 0;
+        
+    }
     } else if (string(argv[1]) == "about") {
         // compile time and date
         const char* compileDate = __DATE__;
@@ -99,27 +113,27 @@ int main(int argc, char *argv[]) {
     for (int i = 2; i < argc; ++i) {
         if (action == 1) {
             string packtoadd = argv[i];
-            if (find(packlist.begin(), packlist.end(), packtoadd) == packlist.end()) {
-                packlist.push_back(packtoadd);
-            } else {
-                cout << "Package " << packtoadd << " is already installed. Reinstalling." << endl;
-            }
+            
             string whatpack = argv[i];
             if (whatpack.find('/') != string::npos) {
                 stringstream ss(whatpack);
                 getline(ss, group, '/');
                 getline(ss, packagename, '/');
-
+                packtoadd = packagename;
                 command = "wget -q " + setmirlink + group + "/" + packagename + "/adds";
                 catcommand = "wget -q --show-progress " + setmirlink + group + "/" + packagename + "/";
             } else {
                 packagename = whatpack;
                 group = "";
-
+                packtoadd = packagename;
                 command = "wget -q " + setmirlink + packagename + "/adds";
                 catcommand = "wget -q --show-progress " + setmirlink + packagename + "/";
             }
-
+            if (find(packlist.begin(), packlist.end(), packtoadd) == packlist.end()) {
+                
+            } else {
+                cout << "Package " << packtoadd << " is already installed. Reinstalling." << endl;
+            }
             int ret = system(command.c_str());
             if (ret != 0) {
                 cerr << ("Command to get files failed!\n" + command) << endl;
@@ -183,6 +197,10 @@ int main(int argc, char *argv[]) {
                     throw runtime_error("Failed to run command: " + chmodcommand);
                 }
 	        };
+            if (find(packlist.begin(), packlist.end(), packtoadd) == packlist.end()) {
+                packlist.push_back(packtoadd);
+                cout << "Installed " << packtoadd << endl;
+            } 
             ss.clear();
             ss.seekg(0,ss.beg);
             arkrjson["packagever"][packagename] = versioncontent;
