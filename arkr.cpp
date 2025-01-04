@@ -28,7 +28,7 @@ string get_mirlink() {
 int main(int argc, char *argv[]) {
     
     if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <in|out> <package_name...>/configure <config|dir|diruser> (arkr.json|usertosetup)" << endl;
+        cerr << "Usage: " << argv[0] << " <in|out> <package_name...>/configure <config|dir|diruser> (arkr.json|None|usertosetup)" << endl;
         return 1;
     }
     json arkrjson;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     if (arkrjson.contains("packages") && arkrjson["packages"].is_array()) {
         packlist = arkrjson["packages"];
     } else { cerr << "JSON does not contain an array named 'packages'!" << endl; return 1; }
-    
+    int confret;
 
     string setmirlink = get_mirlink();
     string group, packagename;
@@ -67,14 +67,46 @@ int main(int argc, char *argv[]) {
         cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
         return 1;
     } else {
-        int confret = system(("cp " + string(argv[2]) + " /etc/arkr.json").c_str()); 
-        if (confret != 0) {
-            cerr << "Failed to copy " << string(argv[2]) << " to /etc/arkr.json" << endl;
+        int conftype;
+        if (argv[2] == "config") {conftype = 1;}
+        else if (argv[2] == "dir") {conftype = 2;}
+        else if (argv[2] == "diruser") {conftype = 3;}
+        else {
+            cerr << "Invalid config type!" << endl;
             return 1;
         }
-        cout << "Copied " << string(argv[2]) << " to /etc/arkr.json" << endl;
-        return 0;
+        switch (conftype) {
+            case 1:
+                confret = system(("cp " + string(argv[3]) + " /etc/arkr.json").c_str()); 
+                if (confret != 0) {
+                    cerr << "Failed to copy " << string(argv[3]) << " to /etc/arkr.json" << endl;
+                    return 1;
+                }
+                cout << "Copied " << string(argv[3]) << " to /etc/arkr.json" << endl;
+                return 0;
+            case 2:
+                confret = system(("mkdir /var/cache/arkr/"));  
+                if (confret != 0) {
+                    cerr << "Failed to make directory /var/cache/arkr/" << endl;
+                    return 1;
+                }
+                cout << "Setup arkr directory /var/cache/arkr/" << endl;
+                return 0;
+            case 3:
+                if (config::Experimental::usermode == false) { 
+                    cerr << "This feature is only available in usermode!" << endl;
+                    return 1;
+                } else {
+                confret = system(("mkdir /home/" + string(argv[3]) + "/.arkr/").c_str());  
+                if (confret != 0) {
+                    cerr << "Failed to make directory /home/" + string(argv[3]) + "/.arkr/" << endl;
+                    return 1;
+                }
+                cout << "Setup arkr directory /home/" + string(argv[3]) + "/.arkr/" << endl;
+                return 0;
+                }
         
+            }
     }
     } else if (string(argv[1]) == "about") {
         // compile time and date
