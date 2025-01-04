@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include "json.hpp"
+#include "config.hpp"
 #include <unistd.h>
 #include <ctime>
 #include <algorithm>
