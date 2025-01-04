@@ -28,7 +28,7 @@ string get_mirlink() {
 int main(int argc, char *argv[]) {
     
     if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <in|out> <package_name...>" << endl;
+        cerr << "Usage: " << argv[0] << " <in|out> <package_name...>/configure <config|dir|diruser> (arkr.json|usertosetup)" << endl;
         return 1;
     }
     json arkrjson;
