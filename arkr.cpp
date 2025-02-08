@@ -50,21 +50,21 @@ int main(int argc, char *argv[]) {
     string group, packagename;
     int action = 0; /* 0 = help, 1 = install, 2 = uninstall */
 
-    if (string(argv[1]) == "in") {
+    if (string(argv[1]) == "in" || string(argv[1]) == "i") {
         action = 1;
         if (geteuid() != 0) {
-        cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
+        cerr << "Failed to run! Are you root?" << endl;
         return 1;
     }
-    } else if (string(argv[1]) == "out") {
+    } else if (string(argv[1]) == "out" || string(argv[1]) == "o") {
         action = 2;
         if (geteuid() != 0) {
-        cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
+        cerr << "Failed to run! Are you root?" << endl;
         return 1;
     }
-    } else if (string(argv[1]) == "configure") {
+    } else if (string(argv[1]) == "configure" || string(argv[1]) == "c") {
         if (geteuid() != 0) {
-        cerr << "This program must be run as root, please su, sudo or doas to run this program" << endl;
+        cerr << "Failed to run! Are you root?" << endl;
         return 1;
     } else {
         int conftype;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
                 } else {
                 confret = system(("mkdir /home/" + string(argv[3]) + "/.arkr/").c_str());  
                 if (confret != 0) {
-                    cerr << "Failed to make directory /home/" + string(argv[3]) + "/.arkr/" << endl;
+                    cerr << "Failed to mkdir /home/" + string(argv[3]) + "/.arkr/" << endl;
                     return 1;
                 }
                 cout << "Setup arkr directory /home/" + string(argv[3]) + "/.arkr/" << endl;
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
             }
             int ret = system(command.c_str());
             if (ret != 0) {
-                cerr << ("Command to get files failed!\n" + command) << endl;
+                cerr << ("Failed to acquire files!\n" + command) << endl;
                 return 1;
             }
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
             cout << "Binaries to download:" << endl;
             ret = system(catcmd.c_str());
             if (ret != 0) {
-                cerr << ("Failed to run command: " + catcmd) << endl;
+                cerr << ("Could not run command: " + catcmd) << endl;
                 return 1;
             }
 
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
             string addscontent;
             FILE* addsfile = fopen("adds", "r");
             if (!addsfile) {
-                cerr << ("Failed to open adds file!") << endl;
+                cerr << ("Could not open adds file!") << endl;
                 return 1;
             }
             while (fgets(addsbuffer.data(), addsbuffer.size(), addsfile) != nullptr) {
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
             string versioncontent;
             FILE* versionfile = fopen("version", "r");
             if (!versionfile) {
-                cerr << ("Failed to open version file!") << endl;
+                cerr << ("Could not open version file!") << endl;
                 return 1;
             }
             while (fgets(versionbuffer.data(), versionbuffer.size(), versionfile) != nullptr) {
@@ -243,23 +243,23 @@ int main(int argc, char *argv[]) {
             if (iter != packlist.end()) {
                 packlist.erase(iter, packlist.end());
             } else {
-                cerr << "No package named that!" << endl;
+                cerr << "Could not find package!" << endl;
                 system("cat /etc/arkr.json");
             }
         }
     }
     if (arkrjson["packages"]==packlist){
-        cout << "No changes done to packlist." << endl;
+        cout << "No changes have been made to packlist." << endl;
     } else {
         arkrjson["packages"]=packlist;
         ofstream outputarkrjson("/etc/arkr.json");
         if (!outputarkrjson.is_open()) {
-            cerr << "Cannot open arkr.json!!!" << endl;
+            cerr << "Could not open arkr.json! Does it exist?" << endl;
             return 1;
         }
         outputarkrjson << setw(4) << arkrjson << endl;
         outputarkrjson.close();
-        cout << "Wrote new package list" << endl;
+        cout << "New packlist written." << endl;
     }
     return 0;
 }
