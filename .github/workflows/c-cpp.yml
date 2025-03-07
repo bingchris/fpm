@@ -1,4 +1,4 @@
-name: Build ArKr
+name: Build FPM
 
 on:
   push:
@@ -27,10 +27,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Compile ArKr
-      run: g++ ./arkr.cpp -o arkr
-    - name: Upload ArKr binary
+    - name: Compile FPM
+      run: g++ ./fpm.cpp -o fpm
+    - name: Upload FPM binary
       uses: actions/upload-artifact@v4
       with:
-        name: arkr-binary
-        path: ./arkr
+        name: fpm-binary
+        path: ./fpm

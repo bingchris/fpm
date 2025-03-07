@@ -1,8 +1,25 @@
-# ArKr (Argonium Kryptonide)
-This is an ongoing project for my GNU/Linux distribution known as Krypton.
+# Foo's Package Manager
 
-If you don't want to compile then you can look at the Actions tab.
-## Compiling
-You are a dingus. Come on, just compile the special file named "arkr.cpp" using g++.
+## Introduction
+Foo's Package Manager is a package manager for Linux systems. It is designed to be simple and easy to use, while still being fast and efficient.
 
-Currently the only supported compiler is g++, but if you want to use another one, then be aware that there might be some bugs.
+
+## Installation
+For now, you need to compile the source code yourself. You can do this by running the following commands:
+
+```bash
+git clone https://github.com/Tarvey/fpm.git
+cd fpm
+g++ ./fpm.cpp -o fpm
+```
+
+## Usage
+For now, there is no documentation. You can look through the source code to see how it works.
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
