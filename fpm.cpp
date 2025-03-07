@@ -1,6 +1,7 @@
 #include "fpm.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <unistd.h>
 
 using namespace std;
 
@@ -13,6 +14,14 @@ int main(int argc, char* argv[]) {
         string action = argv[1];
         if (action == "in" || action == "i") {
             if (argc < 3) throw invalid_argument("Missing package name for installation");
+            // if variable MIRRORFIND=1 then use the fastest mirror
+            if (getenv("MIRRORFIND") != nullptr && fpm::is_root()) {
+                string fastestmirror = fpm::findbestmirror();
+                if (system(("echo "+ fastestmirror + " > /etc/fpm/mirlink").c_str()) != 0) { 
+                    cout << "unable to write or something idk" << endl;
+                }
+                
+            }
             fpm::install_package(argv[2]);
         } else if (action == "out" || action == "o") {
             if (argc < 3) throw invalid_argument("Missing package name for uninstallation");
