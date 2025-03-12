@@ -3,7 +3,7 @@
 #ifndef FPM_LIBRARY_HPP
 #define FPM_LIBRARY_HPP
 
-// ai, what library for system() function?
+
 #include <iostream>
 #include <fstream> 
 #include <stdexcept>
