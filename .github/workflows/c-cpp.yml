@@ -27,6 +27,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Configure
+      run: curl https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp -O
     - name: Compile FPM
       run: g++ ./fpm.cpp -o fpm
     - name: Upload FPM binary
