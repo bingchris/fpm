@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Configure
-      run: curl https://objects.githubusercontent.com/github-production-release-asset-2e65be/11171548/37e0337d-20df-4402-9e32-ed6e30ffb116?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250409%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250409T212546Z&X-Amz-Expires=300&X-Amz-Signature=6797dbc552b612839077d20be9fe40ca0b3aabfb9c9e26515fe361e1dff7c821&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Djson.hpp&response-content-type=application%2Foctet-stream -O
+      run: curl "https://objects.githubusercontent.com/github-production-release-asset-2e65be/11171548/37e0337d-20df-4402-9e32-ed6e30ffb116?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250409%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250409T212546Z&X-Amz-Expires=300&X-Amz-Signature=6797dbc552b612839077d20be9fe40ca0b3aabfb9c9e26515fe361e1dff7c821&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Djson.hpp&response-content-type=application%2Foctet-stream" -O
     - name: Compile FPM
       run: g++ ./fpm.cpp -o fpm
     - name: Upload FPM binary
