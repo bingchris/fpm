@@ -1,7 +1,7 @@
-# Foo's Package Manager
+# Fluorine Package Manager
 
 ## Introduction
-Foo's Package Manager is a package manager for Linux systems. It is designed to be simple and easy to use, while still being fast and efficient.
+Fluorine Package Manager is a package manager for Linux systems. It is designed to be simple and easy to use, while still being fast and efficient.
 
 
 ## Installation
